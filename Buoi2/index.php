@@ -1,9 +1,19 @@
 <?php
 
+// ======================================================
+// 1. MẢNG LƯU DANH SÁCH HỌC PHẦN ĐĂNG KÝ
+// ======================================================
+
 $danhSachDangKy = [];
+
+
+// ======================================================
+// 2. HÀM KIỂM TRA ĐIỀU KIỆN ĐĂNG KÝ
+// ======================================================
 
 function kiemTraDangKy($soTinChi, $tongTinChi)
 {
+    // Sinh viên được đăng ký tối đa 15 tín chỉ
     $gioiHanTinChi = 15;
 
     if ($soTinChi <= 0) {
@@ -17,38 +27,88 @@ function kiemTraDangKy($soTinChi, $tongTinChi)
     return "Được đăng ký";
 }
 
+
+// ======================================================
+// 3. TIẾP NHẬN DỮ LIỆU TỪ FORM
+// ======================================================
+
+$thongBao = "";
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $maSV = $_POST["maSV"];
-    $maHocPhan = $_POST["maHocPhan"];
-    $tenHocPhan = $_POST["tenHocPhan"];
+    // Nhận dữ liệu
+    $maSV = trim($_POST["maSV"]);
+    $maHocPhan = trim($_POST["maHocPhan"]);
+    $tenHocPhan = trim($_POST["tenHocPhan"]);
     $soTinChi = (int) $_POST["soTinChi"];
 
-    $tongTinChi = 0;
 
-    foreach ($danhSachDangKy as $hocPhan) {
-        $tongTinChi += $hocPhan["soTinChi"];
-    }
+    // Kiểm tra dữ liệu nhập
+    if (
+        empty($maSV) ||
+        empty($maHocPhan) ||
+        empty($tenHocPhan) ||
+        $soTinChi <= 0
+    ) {
 
-    $trangThai = kiemTraDangKy($soTinChi, $tongTinChi);
+        $thongBao = "Vui lòng nhập đầy đủ thông tin!";
 
-    if ($trangThai == "Được đăng ký") {
+    } else {
 
-        $hocPhan = [
-            "maSV" => $maSV,
-            "maHocPhan" => $maHocPhan,
-            "tenHocPhan" => $tenHocPhan,
-            "soTinChi" => $soTinChi,
-            "trangThai" => $trangThai
-        ];
+        // Tổng tín chỉ hiện tại
+        $tongTinChi = 0;
 
-        $danhSachDangKy[] = $hocPhan;
+        // Vòng lặp duyệt mảng
+        foreach ($danhSachDangKy as $hocPhan) {
+            $tongTinChi += $hocPhan["soTinChi"];
+        }
+
+
+        // Gọi hàm kiểm tra điều kiện
+        $trangThai = kiemTraDangKy(
+            $soTinChi,
+            $tongTinChi
+        );
+
+
+        // Điều kiện xử lý
+        if ($trangThai == "Được đăng ký") {
+
+            // Tạo dữ liệu học phần
+            $hocPhan = [
+
+                "maSV" => $maSV,
+
+                "maHocPhan" => $maHocPhan,
+
+                "tenHocPhan" => $tenHocPhan,
+
+                "soTinChi" => $soTinChi,
+
+                "trangThai" => $trangThai
+
+            ];
+
+
+            // Thêm vào mảng
+            $danhSachDangKy[] = $hocPhan;
+
+
+            $thongBao = "Đăng ký học phần thành công!";
+
+        } else {
+
+            $thongBao = $trangThai;
+
+        }
     }
 }
 
 ?>
 
+
 <!DOCTYPE html>
+
 <html lang="vi">
 
 <head>
@@ -59,27 +119,96 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <title>Đăng ký học phần</title>
 
+
     <style>
+
+        /* ==========================
+           CÀI ĐẶT CHUNG
+        ========================== */
 
         * {
             box-sizing: border-box;
         }
 
-        body {
-            font-family: Arial, sans-serif;
 
-            /* XANH NƯỚC PASTEL */
-            background: #dff3ff;
+        body {
 
             margin: 0;
 
             padding: 40px 20px;
 
-            color: #52728a;
+            font-family: Arial, sans-serif;
+
+            /* MÀU NỀN GIỐNG ẢNH */
+            background: #eef4ff;
+
+            color: #52647a;
         }
 
+
+        /* ==========================
+           MENU
+        ========================== */
+
+        .menu {
+
+            width: 850px;
+
+            max-width: 100%;
+
+            margin: 0 auto 20px auto;
+
+            background: white;
+
+            padding: 15px 20px;
+
+            border-radius: 15px;
+
+            box-shadow: 0 5px 20px rgba(92, 137, 190, 0.10);
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .menu a {
+
+            text-decoration: none;
+
+            color: #5f8fc9;
+
+            background: #f0f6ff;
+
+            padding: 10px 18px;
+
+            border-radius: 9px;
+
+            font-weight: bold;
+
+            transition: 0.2s;
+        }
+
+
+        .menu a:hover {
+
+            background: #dcecff;
+
+            color: #4f7faf;
+        }
+
+
+        /* ==========================
+           KHUNG CHÍNH
+        ========================== */
+
         .container {
-            width: 800px;
+
+            width: 850px;
 
             max-width: 100%;
 
@@ -87,82 +216,133 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             background: #ffffff;
 
-            padding: 35px;
+            padding: 40px;
 
-            border-radius: 22px;
+            border-radius: 18px;
 
-            box-shadow: 0 8px 25px rgba(100, 170, 210, 0.18);
+            box-shadow: 0 8px 30px rgba(92, 137, 190, 0.12);
 
-            border: 1px solid #c5e8fa;
+            border: 1px solid #e1ebf8;
         }
+
+
+        /* ==========================
+           TIÊU ĐỀ
+        ========================== */
 
         h1 {
+
             text-align: center;
 
-            color: #6baed0;
+            color: #5f8fc9;
 
-            margin-bottom: 30px;
+            font-size: 30px;
 
-            font-size: 28px;
+            margin-top: 0;
+
+            margin-bottom: 10px;
         }
 
-        h2 {
-            color: #6baed0;
 
-            margin-top: 30px;
+        .moTa {
 
-            margin-bottom: 15px;
-        }
+            text-align: center;
 
-        label {
-            display: block;
+            color: #8798aa;
 
-            margin-top: 16px;
-
-            margin-bottom: 7px;
-
-            font-weight: bold;
-
-            color: #5d8299;
-        }
-
-        input {
-            width: 100%;
-
-            padding: 12px 14px;
-
-            border: 1px solid #c3e5f7;
-
-            border-radius: 11px;
-
-            outline: none;
-
-            background: #f8fcff;
-
-            color: #52728a;
+            margin-bottom: 35px;
 
             font-size: 14px;
         }
 
-        input:focus {
-            border-color: #91cce8;
 
-            box-shadow: 0 0 0 3px rgba(145, 204, 232, 0.18);
+        h2 {
+
+            color: #6594c9;
+
+            font-size: 22px;
+
+            margin-top: 35px;
+
+            margin-bottom: 18px;
         }
 
-        button {
-            margin-top: 24px;
+
+        /* ==========================
+           FORM
+        ========================== */
+
+        label {
+
+            display: block;
+
+            margin-top: 18px;
+
+            margin-bottom: 8px;
+
+            font-weight: bold;
+
+            color: #607b98;
+        }
+
+
+        input {
 
             width: 100%;
+
+            padding: 13px 15px;
+
+            border: 1px solid #d4e3f3;
+
+            border-radius: 10px;
+
+            background: #f9fbff;
+
+            color: #52647a;
+
+            font-size: 15px;
+
+            outline: none;
+
+            transition: 0.2s;
+        }
+
+
+        input:focus {
+
+            border-color: #91b6dc;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(145, 182, 220, 0.15);
+        }
+
+
+        input::placeholder {
+
+            color: #a6b6c8;
+        }
+
+
+        /* ==========================
+           NÚT ĐĂNG KÝ
+        ========================== */
+
+        button {
+
+            width: 100%;
+
+            margin-top: 25px;
 
             padding: 13px;
 
             border: none;
 
-            border-radius: 11px;
+            border-radius: 10px;
 
-            /* NÚT XANH NƯỚC PASTEL */
-            background: #9bd4ee;
+            background: #91b6dc;
 
             color: white;
 
@@ -175,138 +355,277 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             transition: 0.2s;
         }
 
+
         button:hover {
-            background: #82c4e3;
+
+            background: #7fa7d0;
         }
 
-        .thong-bao {
+
+        /* ==========================
+           THÔNG BÁO
+        ========================== */
+
+        .thongBao {
+
             margin-top: 25px;
 
             padding: 15px 18px;
 
-            background: #e5f5fd;
+            background: #f0f6ff;
 
-            border-left: 5px solid #9bd4ee;
+            border-left: 4px solid #91b6dc;
 
             border-radius: 10px;
 
-            color: #52728a;
+            color: #5c7692;
         }
 
+
+        /* ==========================
+           BẢNG
+        ========================== */
+
         table {
+
             width: 100%;
+
+            margin-top: 15px;
 
             border-collapse: collapse;
 
-            margin-top: 15px;
+            overflow: hidden;
 
             border-radius: 10px;
 
-            overflow: hidden;
+            border: 1px solid #dce7f4;
         }
+
 
         th {
-            background: #b8e0f3;
 
-            color: #4f748a;
+            padding: 13px 10px;
 
-            padding: 12px 8px;
+            background: #dcecff;
 
-            border: 1px solid #a8d7ed;
+            color: #587da5;
+
+            border: 1px solid #d2e2f2;
+
+            font-size: 14px;
         }
 
+
         td {
-            padding: 11px 8px;
+
+            padding: 12px 10px;
 
             text-align: center;
 
-            border: 1px solid #d9edf8;
+            background: #ffffff;
 
-            background: #fbfdff;
+            border: 1px solid #e2eaf3;
+
+            font-size: 14px;
         }
+
 
         tr:hover td {
-            background: #f0f9fe;
+
+            background: #f6f9ff;
         }
 
-        .tong-tin-chi {
-            margin-top: 15px;
 
-            padding: 12px;
+        /* ==========================
+           TỔNG TÍN CHỈ
+        ========================== */
 
-            background: #eaf7fd;
+        .tongTinChi {
+
+            margin-top: 18px;
+
+            padding: 14px 18px;
+
+            background: #f0f6ff;
 
             border-radius: 10px;
 
-            color: #52728a;
+            color: #5d7895;
 
             font-weight: bold;
         }
 
+
+        /* ==========================
+           GHI CHÚ
+        ========================== */
+
+        .ghiChu {
+
+            margin-top: 25px;
+
+            padding: 15px;
+
+            background: #f8fbff;
+
+            border-radius: 10px;
+
+            color: #8293a6;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+
+        /* ==========================
+           MOBILE
+        ========================== */
+
         @media (max-width: 600px) {
 
             body {
+
                 padding: 20px 10px;
             }
 
+
             .container {
-                padding: 20px;
+
+                padding: 25px 20px;
             }
+
 
             h1 {
-                font-size: 23px;
+
+                font-size: 24px;
             }
 
+
             table {
+
                 font-size: 12px;
             }
 
+
             th,
             td {
+
                 padding: 8px 5px;
             }
+
         }
 
     </style>
 
 </head>
 
+
 <body>
+
+
+<!-- ==================================================
+     MENU CHUYỂN TRANG
+=================================================== -->
+
+<div class="menu">
+
+    <a href="index.php">
+        Đăng ký học phần
+    </a>
+
+    <a href="ketqua.php">
+        Kết quả học tập
+    </a>
+
+    <a href="xeploai.php">
+        Xếp loại điểm
+    </a>
+
+</div>
+
+
+
+<!-- ==================================================
+     NỘI DUNG CHÍNH
+=================================================== -->
 
 <div class="container">
 
-    <h1>ĐĂNG KÝ HỌC PHẦN</h1>
+
+    <h1>
+        ĐĂNG KÝ HỌC PHẦN
+    </h1>
+
+
+    <p class="moTa">
+        Hệ thống đăng ký học phần dành cho sinh viên
+    </p>
+
+
+
+    <!-- ==================================================
+         FORM NHẬP
+    =================================================== -->
+
+    <h2>
+        Thông tin đăng ký
+    </h2>
+
 
     <form method="POST">
 
-        <label>Mã sinh viên:</label>
+
+        <!-- MÃ SINH VIÊN -->
+
+        <label>
+            Mã sinh viên
+        </label>
 
         <input
             type="text"
             name="maSV"
-            placeholder="Ví dụ: SV001"
+            placeholder="Ví dụ: 224001836"
             required
         >
 
-        <label>Mã học phần:</label>
+
+
+        <!-- MÃ HỌC PHẦN -->
+
+        <label>
+            Mã học phần
+        </label>
 
         <input
             type="text"
             name="maHocPhan"
-            placeholder="Ví dụ: PHP01"
+            placeholder="Ví dụ: LTH001"
             required
         >
 
-        <label>Tên học phần:</label>
+
+
+        <!-- TÊN HỌC PHẦN -->
+
+        <label>
+            Tên học phần
+        </label>
 
         <input
             type="text"
             name="tenHocPhan"
-            placeholder="Ví dụ: Lập trình PHP"
+            placeholder="Ví dụ: Lập trình Web"
             required
         >
 
-        <label>Số tín chỉ:</label>
+
+
+        <!-- SỐ TÍN CHỈ -->
+
+        <label>
+            Số tín chỉ
+        </label>
 
         <input
             type="number"
@@ -317,45 +636,111 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             required
         >
 
+
+
+        <!-- NÚT -->
+
         <button type="submit">
             Đăng ký học phần
         </button>
 
+
     </form>
 
 
-    <?php if ($_SERVER["REQUEST_METHOD"] == "POST") { ?>
 
-        <div class="thong-bao">
+    <!-- ==================================================
+         THÔNG BÁO
+    =================================================== -->
 
-            <strong>Trạng thái:</strong>
+    <?php
 
-            <?php echo $trangThai; ?>
+    if (!empty($thongBao)) {
 
-        </div>
+    ?>
 
-    <?php } ?>
+        <div class="thongBao">
 
-
-    <?php if (!empty($danhSachDangKy)) { ?>
-
-        <h2>Danh sách học phần đã đăng ký</h2>
-
-        <table>
-
-            <tr>
-                <th>STT</th>
-                <th>Mã SV</th>
-                <th>Mã học phần</th>
-                <th>Tên học phần</th>
-                <th>Tín chỉ</th>
-                <th>Trạng thái</th>
-            </tr>
+            <strong>
+                Thông báo:
+            </strong>
 
             <?php
 
+            echo htmlspecialchars($thongBao);
+
+            ?>
+
+        </div>
+
+    <?php
+
+    }
+
+    ?>
+
+
+
+    <!-- ==================================================
+         DANH SÁCH ĐĂNG KÝ
+    =================================================== -->
+
+    <?php
+
+    if (!empty($danhSachDangKy)) {
+
+    ?>
+
+        <h2>
+            Danh sách học phần đã đăng ký
+        </h2>
+
+
+        <table>
+
+
+            <tr>
+
+                <th>
+                    STT
+                </th>
+
+                <th>
+                    Mã sinh viên
+                </th>
+
+                <th>
+                    Mã học phần
+                </th>
+
+                <th>
+                    Tên học phần
+                </th>
+
+                <th>
+                    Tín chỉ
+                </th>
+
+                <th>
+                    Trạng thái
+                </th>
+
+            </tr>
+
+
+
+            <?php
+
+            // Biến STT
             $stt = 1;
+
+            // Tổng tín chỉ
             $tongTinChiHienTai = 0;
+
+
+            // ==================================================
+            // VÒNG LẶP DUYỆT MẢNG
+            // ==================================================
 
             foreach ($danhSachDangKy as $hocPhan) {
 
@@ -365,19 +750,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <tr>
 
-                    <td><?php echo $stt; ?></td>
 
-                    <td><?php echo $hocPhan["maSV"]; ?></td>
+                    <td>
+                        <?php echo $stt; ?>
+                    </td>
 
-                    <td><?php echo $hocPhan["maHocPhan"]; ?></td>
 
-                    <td><?php echo $hocPhan["tenHocPhan"]; ?></td>
+                    <td>
+                        <?php
+                        echo htmlspecialchars(
+                            $hocPhan["maSV"]
+                        );
+                        ?>
+                    </td>
 
-                    <td><?php echo $hocPhan["soTinChi"]; ?></td>
 
-                    <td><?php echo $hocPhan["trangThai"]; ?></td>
+                    <td>
+                        <?php
+                        echo htmlspecialchars(
+                            $hocPhan["maHocPhan"]
+                        );
+                        ?>
+                    </td>
+
+
+                    <td>
+                        <?php
+                        echo htmlspecialchars(
+                            $hocPhan["tenHocPhan"]
+                        );
+                        ?>
+                    </td>
+
+
+                    <td>
+                        <?php
+                        echo $hocPhan["soTinChi"];
+                        ?>
+                    </td>
+
+
+                    <td>
+                        <?php
+                        echo $hocPhan["trangThai"];
+                        ?>
+                    </td>
+
 
                 </tr>
+
 
             <?php
 
@@ -387,19 +808,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             ?>
 
+
         </table>
 
-        <div class="tong-tin-chi">
+
+
+        <!-- TỔNG TÍN CHỈ -->
+
+        <div class="tongTinChi">
 
             Tổng số tín chỉ:
-            <?php echo $tongTinChiHienTai; ?>
+
+            <?php
+
+            echo $tongTinChiHienTai;
+
+            ?>
+
             / 15 tín chỉ
 
         </div>
 
-    <?php } ?>
+
+    <?php
+
+    }
+
+    ?>
+
+
+
+    <!-- ==================================================
+         GHI CHÚ
+    =================================================== -->
+
+    <div class="ghiChu">
+
+        <strong>Quy định:</strong>
+
+        Sinh viên được đăng ký tối đa
+        <strong>15 tín chỉ</strong>.
+
+        Hệ thống sẽ kiểm tra số tín chỉ trước khi
+        xác nhận đăng ký.
+
+    </div>
+
 
 </div>
+
 
 </body>
 
