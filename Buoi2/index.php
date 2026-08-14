@@ -1,38 +1,56 @@
 <?php
 
-// Mảng lưu thông tin sinh viên
-$sinhVien = [
-    "maSV" => "",
-    "hoTen" => "",
-    "lop" => "",
-    "email" => "",
-    "trangThai" => ""
-];
+// Mảng lưu danh sách học phần đã đăng ký
+$danhSachDangKy = [];
 
-// Hàm kiểm tra trạng thái thông tin sinh viên
-function kiemTraThongTin($hoTen, $lop, $email)
+// Hàm kiểm tra điều kiện đăng ký
+function kiemTraDangKy($soTinChi, $tongTinChi)
 {
-    if ($hoTen != "" && $lop != "" && $email != "") {
-        return "Đã cập nhật đầy đủ";
-    } else {
-        return "Chưa đầy đủ thông tin";
+    $gioiHanTinChi = 15;
+
+    if ($soTinChi <= 0) {
+        return "Không hợp lệ";
     }
+
+    if ($tongTinChi + $soTinChi > $gioiHanTinChi) {
+        return "Không được đăng ký - vượt quá 15 tín chỉ";
+    }
+
+    return "Được đăng ký";
 }
+
 
 // Tiếp nhận và xử lý dữ liệu từ form
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $sinhVien["maSV"] = $_POST["maSV"];
-    $sinhVien["hoTen"] = $_POST["hoTen"];
-    $sinhVien["lop"] = $_POST["lop"];
-    $sinhVien["email"] = $_POST["email"];
+    $maSV = $_POST["maSV"];
+    $maHocPhan = $_POST["maHocPhan"];
+    $tenHocPhan = $_POST["tenHocPhan"];
+    $soTinChi = (int) $_POST["soTinChi"];
 
-    // Sử dụng hàm tự định nghĩa
-    $sinhVien["trangThai"] = kiemTraThongTin(
-        $sinhVien["hoTen"],
-        $sinhVien["lop"],
-        $sinhVien["email"]
-    );
+    // Tính tổng tín chỉ hiện tại
+    $tongTinChi = 0;
+
+    foreach ($danhSachDangKy as $hocPhan) {
+        $tongTinChi += $hocPhan["soTinChi"];
+    }
+
+    // Kiểm tra điều kiện đăng ký
+    $trangThai = kiemTraDangKy($soTinChi, $tongTinChi);
+
+    // Nếu đủ điều kiện thì thêm vào mảng
+    if ($trangThai == "Được đăng ký") {
+
+        $hocPhan = [
+            "maSV" => $maSV,
+            "maHocPhan" => $maHocPhan,
+            "tenHocPhan" => $tenHocPhan,
+            "soTinChi" => $soTinChi,
+            "trangThai" => $trangThai
+        ];
+
+        $danhSachDangKy[] = $hocPhan;
+    }
 }
 
 ?>
@@ -42,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <head>
     <meta charset="UTF-8">
-    <title>Thông tin sinh viên</title>
+    <title>Đăng ký học phần</title>
 
     <style>
         body {
@@ -53,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .container {
-            width: 700px;
+            width: 800px;
             margin: auto;
             background: white;
             padding: 30px;
@@ -63,11 +81,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         h1 {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         h2 {
-            margin-top: 25px;
+            margin-top: 30px;
         }
 
         label {
@@ -87,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         button {
             margin-top: 20px;
-            padding: 11px 20px;
+            padding: 11px 25px;
             border: none;
             border-radius: 6px;
             background: #333;
@@ -109,11 +127,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         td {
             border: 1px solid #ccc;
             padding: 10px;
-            text-align: left;
+            text-align: center;
         }
 
         th {
             background: #eee;
+        }
+
+        .thong-bao {
+            margin-top: 20px;
+            padding: 12px;
+            background: #f1f1f1;
+            border-radius: 6px;
         }
     </style>
 </head>
@@ -122,9 +147,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <div class="container">
 
-    <h1>THÔNG TIN SINH VIÊN</h1>
+    <h1>ĐĂNG KÝ HỌC PHẦN</h1>
 
-    <!-- Form nhập thông tin -->
     <form method="POST">
 
         <label>Mã sinh viên:</label>
@@ -135,75 +159,111 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             required
         >
 
-        <label>Họ và tên:</label>
+        <label>Mã học phần:</label>
         <input
             type="text"
-            name="hoTen"
-            placeholder="Nhập họ và tên"
+            name="maHocPhan"
+            placeholder="Ví dụ: PHP01"
             required
         >
 
-        <label>Lớp:</label>
+        <label>Tên học phần:</label>
         <input
             type="text"
-            name="lop"
-            placeholder="Ví dụ: CNTT01"
+            name="tenHocPhan"
+            placeholder="Ví dụ: Lập trình PHP"
             required
         >
 
-        <label>Email:</label>
+        <label>Số tín chỉ:</label>
         <input
-            type="email"
-            name="email"
-            placeholder="Nhập email"
+            type="number"
+            name="soTinChi"
+            min="1"
+            max="6"
+            placeholder="Nhập số tín chỉ"
             required
         >
 
         <button type="submit">
-            Cập nhật thông tin
+            Đăng ký học phần
         </button>
 
     </form>
 
 
-    <?php if ($sinhVien["maSV"] != "") { ?>
+    <?php if ($_SERVER["REQUEST_METHOD"] == "POST") { ?>
 
-        <h2>Thông tin đã nhập</h2>
+        <div class="thong-bao">
+
+            <strong>Trạng thái:</strong>
+
+            <?php echo $trangThai; ?>
+
+        </div>
+
+    <?php } ?>
+
+
+    <?php if (!empty($danhSachDangKy)) { ?>
+
+        <h2>Danh sách học phần đã đăng ký</h2>
 
         <table>
 
             <tr>
-                <th>Thông tin</th>
-                <th>Giá trị</th>
+                <th>STT</th>
+                <th>Mã SV</th>
+                <th>Mã học phần</th>
+                <th>Tên học phần</th>
+                <th>Tín chỉ</th>
+                <th>Trạng thái</th>
             </tr>
 
-            <?php foreach ($sinhVien as $key => $value) { ?>
+            <?php
+
+            $stt = 1;
+
+            // Vòng lặp duyệt danh sách
+            foreach ($danhSachDangKy as $hocPhan) {
+
+            ?>
 
                 <tr>
 
                     <td>
-                        <?php
-                        if ($key == "maSV") {
-                            echo "Mã sinh viên";
-                        } elseif ($key == "hoTen") {
-                            echo "Họ và tên";
-                        } elseif ($key == "lop") {
-                            echo "Lớp";
-                        } elseif ($key == "email") {
-                            echo "Email";
-                        } else {
-                            echo "Trạng thái";
-                        }
-                        ?>
+                        <?php echo $stt; ?>
                     </td>
 
                     <td>
-                        <?php echo $value; ?>
+                        <?php echo $hocPhan["maSV"]; ?>
+                    </td>
+
+                    <td>
+                        <?php echo $hocPhan["maHocPhan"]; ?>
+                    </td>
+
+                    <td>
+                        <?php echo $hocPhan["tenHocPhan"]; ?>
+                    </td>
+
+                    <td>
+                        <?php echo $hocPhan["soTinChi"]; ?>
+                    </td>
+
+                    <td>
+                        <?php echo $hocPhan["trangThai"]; ?>
                     </td>
 
                 </tr>
 
-            <?php } ?>
+            <?php
+
+                $stt++;
+
+            }
+
+            ?>
 
         </table>
 
