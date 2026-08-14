@@ -1,9 +1,7 @@
 <?php
 
-// Mảng lưu danh sách học phần đã đăng ký
 $danhSachDangKy = [];
 
-// Hàm kiểm tra điều kiện đăng ký
 function kiemTraDangKy($soTinChi, $tongTinChi)
 {
     $gioiHanTinChi = 15;
@@ -19,8 +17,6 @@ function kiemTraDangKy($soTinChi, $tongTinChi)
     return "Được đăng ký";
 }
 
-
-// Tiếp nhận và xử lý dữ liệu từ form
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $maSV = $_POST["maSV"];
@@ -28,17 +24,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tenHocPhan = $_POST["tenHocPhan"];
     $soTinChi = (int) $_POST["soTinChi"];
 
-    // Tính tổng tín chỉ hiện tại
     $tongTinChi = 0;
 
     foreach ($danhSachDangKy as $hocPhan) {
         $tongTinChi += $hocPhan["soTinChi"];
     }
 
-    // Kiểm tra điều kiện đăng ký
     $trangThai = kiemTraDangKy($soTinChi, $tongTinChi);
 
-    // Nếu đủ điều kiện thì thêm vào mảng
     if ($trangThai == "Được đăng ký") {
 
         $hocPhan = [
@@ -59,88 +52,223 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="vi">
 
 <head>
+
     <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Đăng ký học phần</title>
 
     <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background: #f4f6f8;
+
+            /* XANH NƯỚC PASTEL */
+            background: #dff3ff;
+
             margin: 0;
-            padding: 40px;
+
+            padding: 40px 20px;
+
+            color: #52728a;
         }
 
         .container {
             width: 800px;
+
+            max-width: 100%;
+
             margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+            background: #ffffff;
+
+            padding: 35px;
+
+            border-radius: 22px;
+
+            box-shadow: 0 8px 25px rgba(100, 170, 210, 0.18);
+
+            border: 1px solid #c5e8fa;
         }
 
         h1 {
             text-align: center;
+
+            color: #6baed0;
+
             margin-bottom: 30px;
+
+            font-size: 28px;
         }
 
         h2 {
+            color: #6baed0;
+
             margin-top: 30px;
+
+            margin-bottom: 15px;
         }
 
         label {
             display: block;
-            margin-top: 15px;
-            margin-bottom: 6px;
+
+            margin-top: 16px;
+
+            margin-bottom: 7px;
+
             font-weight: bold;
+
+            color: #5d8299;
         }
 
         input {
             width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+
+            padding: 12px 14px;
+
+            border: 1px solid #c3e5f7;
+
+            border-radius: 11px;
+
+            outline: none;
+
+            background: #f8fcff;
+
+            color: #52728a;
+
+            font-size: 14px;
+        }
+
+        input:focus {
+            border-color: #91cce8;
+
+            box-shadow: 0 0 0 3px rgba(145, 204, 232, 0.18);
         }
 
         button {
-            margin-top: 20px;
-            padding: 11px 25px;
+            margin-top: 24px;
+
+            width: 100%;
+
+            padding: 13px;
+
             border: none;
-            border-radius: 6px;
-            background: #333;
+
+            border-radius: 11px;
+
+            /* NÚT XANH NƯỚC PASTEL */
+            background: #9bd4ee;
+
             color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
             cursor: pointer;
+
+            transition: 0.2s;
         }
 
         button:hover {
-            background: #555;
+            background: #82c4e3;
+        }
+
+        .thong-bao {
+            margin-top: 25px;
+
+            padding: 15px 18px;
+
+            background: #e5f5fd;
+
+            border-left: 5px solid #9bd4ee;
+
+            border-radius: 10px;
+
+            color: #52728a;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
 
-        th,
-        td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: center;
+            border-collapse: collapse;
+
+            margin-top: 15px;
+
+            border-radius: 10px;
+
+            overflow: hidden;
         }
 
         th {
-            background: #eee;
+            background: #b8e0f3;
+
+            color: #4f748a;
+
+            padding: 12px 8px;
+
+            border: 1px solid #a8d7ed;
         }
 
-        .thong-bao {
-            margin-top: 20px;
-            padding: 12px;
-            background: #f1f1f1;
-            border-radius: 6px;
+        td {
+            padding: 11px 8px;
+
+            text-align: center;
+
+            border: 1px solid #d9edf8;
+
+            background: #fbfdff;
         }
+
+        tr:hover td {
+            background: #f0f9fe;
+        }
+
+        .tong-tin-chi {
+            margin-top: 15px;
+
+            padding: 12px;
+
+            background: #eaf7fd;
+
+            border-radius: 10px;
+
+            color: #52728a;
+
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 20px 10px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 8px 5px;
+            }
+        }
+
     </style>
+
 </head>
 
 <body>
@@ -152,6 +280,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <form method="POST">
 
         <label>Mã sinh viên:</label>
+
         <input
             type="text"
             name="maSV"
@@ -160,6 +289,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         >
 
         <label>Mã học phần:</label>
+
         <input
             type="text"
             name="maHocPhan"
@@ -168,6 +298,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         >
 
         <label>Tên học phần:</label>
+
         <input
             type="text"
             name="tenHocPhan"
@@ -176,6 +307,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         >
 
         <label>Số tín chỉ:</label>
+
         <input
             type="number"
             name="soTinChi"
@@ -223,37 +355,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <?php
 
             $stt = 1;
+            $tongTinChiHienTai = 0;
 
-            // Vòng lặp duyệt danh sách
             foreach ($danhSachDangKy as $hocPhan) {
+
+                $tongTinChiHienTai += $hocPhan["soTinChi"];
 
             ?>
 
                 <tr>
 
-                    <td>
-                        <?php echo $stt; ?>
-                    </td>
+                    <td><?php echo $stt; ?></td>
 
-                    <td>
-                        <?php echo $hocPhan["maSV"]; ?>
-                    </td>
+                    <td><?php echo $hocPhan["maSV"]; ?></td>
 
-                    <td>
-                        <?php echo $hocPhan["maHocPhan"]; ?>
-                    </td>
+                    <td><?php echo $hocPhan["maHocPhan"]; ?></td>
 
-                    <td>
-                        <?php echo $hocPhan["tenHocPhan"]; ?>
-                    </td>
+                    <td><?php echo $hocPhan["tenHocPhan"]; ?></td>
 
-                    <td>
-                        <?php echo $hocPhan["soTinChi"]; ?>
-                    </td>
+                    <td><?php echo $hocPhan["soTinChi"]; ?></td>
 
-                    <td>
-                        <?php echo $hocPhan["trangThai"]; ?>
-                    </td>
+                    <td><?php echo $hocPhan["trangThai"]; ?></td>
 
                 </tr>
 
@@ -267,9 +389,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         </table>
 
+        <div class="tong-tin-chi">
+
+            Tổng số tín chỉ:
+            <?php echo $tongTinChiHienTai; ?>
+            / 15 tín chỉ
+
+        </div>
+
     <?php } ?>
 
 </div>
 
 </body>
+
 </html>
